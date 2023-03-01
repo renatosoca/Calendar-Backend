@@ -1,0 +1,25 @@
+{
+  "name": "calendar-backend",
+  "version": "1.0.0",
+  "description": "Backend del proyecto calendar",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renatosoca/Project_Calendar_Backend-Node.git"
+  },
+  "author": "Renato Soca",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0"
+  }
+}
