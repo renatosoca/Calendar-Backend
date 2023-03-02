@@ -2,8 +2,9 @@
 import express from 'express';
 import { check } from 'express-validator'; 
 
-import { fieldsValidator } from '../middlewares/fieldsValidator.js';
 import { authUser, createUser, revalidateToken } from '../controllers/authController.js';
+import { fieldsValidator } from '../middlewares/fieldsValidator.js';
+import jwtValidator from '../middlewares/jwtValidator.js';
 
 const routes = express.Router();
 
@@ -14,6 +15,7 @@ routes.route('/login').post( [
     ).isLength({ min: 8 }).matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
   fieldsValidator,
 ], authUser );
+
 routes.route('/register').post( [
   check('name', 'El nombre es obligatorio').isLength({ min: 2 }),
   check('email', 'El email es obligatorio').isEmail(),
@@ -23,6 +25,6 @@ routes.route('/register').post( [
   fieldsValidator,
 ], createUser );
 
-routes.route('/renew').get( revalidateToken );
+routes.route('/renew').get( jwtValidator, revalidateToken );
 
 export default routes;

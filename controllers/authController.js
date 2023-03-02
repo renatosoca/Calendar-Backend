@@ -1,5 +1,6 @@
 import { response, request } from 'express';
 import userModel from '../models/userModel.js';
+import generateJWT from '../helpers/generateJWT.js';
 
 const authUser = async ( req, res = response ) => {
   const { email, password } = req.body;
@@ -8,10 +9,19 @@ const authUser = async ( req, res = response ) => {
     const user = await userModel.findOne({ email });
     if ( !user ) return res.status(400).json({ ok: false, msg: 'El email no existe' });
 
+    //if ( !user.confirmed ) return res.status(400).json({ ok: false, msg: 'El email no ha sido confirmado' });
+
     const validPassword = await user.matchPassword( password );
     if ( !validPassword ) return res.status(400).json({ ok: false, msg: 'Contraseña incorrecta' });
 
-    return res.status(201).json({ ok: true, uid: user.id, name: user.name });
+    const { _id, name } = user;
+
+    return res.status(201).json({ 
+      ok: true,
+      _id,
+      name,
+      jwt:  generateJWT( _id, name ),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ ok: false, msg: 'Error del sistema' });
@@ -26,17 +36,32 @@ const createUser = async ( req = request, res = response ) => {
     if ( userExist ) return res.status(400).json({ ok: false, msg: 'El email ya está en uso' });
 
     const user = new userModel( req.body )
-    await user.save();
-  
-    return res.status(201).json({ ok: true, uid: user.id, name: user.name });
+    const savedUser = await user.save();
+
+    const { _id, name } = savedUser;
+
+    return res.status(201).json({ 
+      ok: true,
+      _id,
+      name,
+      token: generateJWT( _id, name ),
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ ok: false, msg: 'Error del sistema' });
+    res.status(500).json({ 
+      ok: false, 
+      msg: 'Error del sistema' 
+    });
   }
 }
 
 const revalidateToken = ( req, res = response ) => {
-  res.status(201).json({ ok: true, page: 'tokens' });
+  const { _id, name } = req.user;
+
+  res.status(201).json({ 
+    ok: true,
+    token: generateJWT( _id, name ),
+  });
 }
 
 export {
