@@ -1,6 +1,8 @@
 import { Schema, model } from 'mongoose'; 
 import bcrypt from 'bcrypt';
 
+import generateToken from '../helpers/generateToken.js';
+
 const userSchema = new Schema({
   name: {
     type: String,
@@ -17,6 +19,18 @@ const userSchema = new Schema({
     type: String,
     required: true,
     trim: true,
+  },
+  token: {
+    type: String,
+    default: generateToken(),
+  },
+  confirmed: {
+    type: Boolean,
+    default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
   }
 });
 
