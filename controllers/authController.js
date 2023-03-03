@@ -2,6 +2,8 @@ import { response, request } from 'express';
 import userModel from '../models/userModel.js';
 import generateJWT from '../helpers/generateJWT.js';
 import generateToken from '../helpers/generateToken.js';
+import emailRegister from '../helpers/emailRegister.js';
+import emailResetPass from '../helpers/emailResetPass.js';
 
 const authUser = async ( req = request, res = response ) => {
   const { email, password } = req.body;
@@ -26,12 +28,12 @@ const authUser = async ( req = request, res = response ) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ ok: false, msg: 'Error del sistema' });
+    res.status(500).json({ ok: false, msg: 'Error del sistema, comunicate con el administrador' });
   }
 }
 
 const createUser = async ( req = request, res = response ) => {
-  const { email } = req.body;
+  const { email, name } = req.body;
 
   try {
     const userExist = await userModel.findOne({ email });
@@ -39,14 +41,19 @@ const createUser = async ( req = request, res = response ) => {
 
     const user = new userModel( req.body )
     const savedUser = await user.save();
+    const { _id, token } = savedUser;
 
-    const { _id, name } = savedUser;
+    emailRegister({
+      email,
+      name,
+      token
+    })
 
     return res.status(201).json({ 
       ok: true,
       _id,
       name,
-      token: generateJWT( _id, name ),
+      //token: generateJWT( _id, name ),
     });
   } catch (error) {
     console.log(error);
@@ -100,13 +107,18 @@ const resetPassword = async ( req = request, res = response ) => {
     if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'El email no ha sido confirmado' });
 
     user.token = generateToken();
-    await user.save();
+    const { name, token } = await user.save();
 
     //Enviar Email
+    emailResetPass({
+      email,
+      name,
+      token,
+    });
 
     return res.status(201).json({
       ok: true,
-      msg: 'Hemos enviado las instrucciones a su correo'
+      msg: 'Hemos enviado las instrucciones a su correo electrónico'
     })
   } catch (error) {
     return res.status(500).json({
@@ -211,11 +223,13 @@ const changePasswordProfile = async ( req = request, res = response ) => {
   const { _id } = req.user;
   const { oldPassword, newPassword } = req.body;
 
+
   try {
     const user = await userModel.findById( _id );
     if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no encontrado' });
 
-    if ( ! await userModel.matchPassword( oldPassword ) ) return res.status(400).json({ ok: false, msg: 'La contraseña es incorrecta' });
+    const validPassword = await user.matchPassword( oldPassword );
+    if ( !validPassword ) return res.status(404).json({ ok: false, msg: 'La contraseña actual es incorrecta' });
 
     user.password = newPassword;
     await user.save();

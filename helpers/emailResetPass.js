@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const emailRegister = async ( payload ) => {
+const emailResetPass = async ( payload ) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -15,13 +15,13 @@ const emailRegister = async ( payload ) => {
     const sendEmail = await transporter.sendMail({
       from: '"Foo 👻" <admin@calendar.com>',
       to: email,
-      subject: 'Registro de usuario',
+      subject: 'Recuperar Contraseña',
       html: `
-        <p>Hola ${name}, comprueba tu cuenta en Calendar</p>
-        <p>Tu cuenta ya está lista, solo debes comprobarla en el siguiente enlace:
-        <a href="${process.env.FRONT_URI}/confirm/${token}" target="_black">Confirmar Cuenta</a></p>
+        <p>Hola ${name}, parece que solicitaste reestablecer la contraseña de tu cuenta de Calendar </p>
+        <p>Para establecer una nueva contraseña, solo tienes que seguir el siguiente enlace:
+        <a href="${process.env.FRONT_URI}/reset/${token}" target="_black">Reestablecer Contraseña</a></p>
         
-        <p>Si tu no creaste esta cuenta, puedes ignorar este mensaje</p>
+        <p>Si tu no solicitó reestablecer su contraseña, puedes ignorar este mensaje</p>
       `,
     });
     console.log(`Message sent: ${sendEmail.messageId}`);
@@ -30,4 +30,4 @@ const emailRegister = async ( payload ) => {
   }
 }
 
-export default emailRegister;
+export default emailResetPass;
