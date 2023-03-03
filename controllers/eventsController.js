@@ -5,7 +5,7 @@ const getEvents = async ( req = request, res = response ) => {
   const { _id } = req.user;
 
   try {
-    const events = await eventModel.find({ user: _id }).populate('user', 'name email');
+    const events = await eventModel.find(/* { user: _id } */).populate('user', 'name email');
   
     res.status(200).json({ 
       ok: true,
