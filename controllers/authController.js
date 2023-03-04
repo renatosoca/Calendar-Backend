@@ -65,11 +65,14 @@ const createUser = async ( req = request, res = response ) => {
 }
 
 const revalidateToken = ( req = request, res = response ) => {
-  const { _id, name } = req.user;
+  const { _id, name, email } = req.user;
 
   res.status(201).json({ 
     ok: true,
-    token: generateJWT( _id, name ),
+    jwt: generateJWT( _id, name ),
+    _id,
+    name,
+    email,
   });
 }
 
