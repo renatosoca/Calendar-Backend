@@ -1,6 +1,6 @@
 # Para correr el proyecto
-  npm install
-  npm run dev | npm start
+  - npm install
+  - npm run dev o npm start
 
 ## Variables de entorno
   Crear un archivo .env en la raiz del proyecto con las siguientes variables:
@@ -20,8 +20,8 @@
   - http://localhost:4000/api/auth/register Metodo: POST
   - http://localhost:4000/api/auth/confirm/:token   Metodo: GET (Confirmar el email)
   - http://localhost:4000/api/auth/forgot-password  Metodo: POST  (Enviar email para recuperar contraseña)
-  - http://localhost:4000/api/auth/reset/:token    Metodo: GET && POST  (Cambiar contraseña)
+  - http://localhost:4000/api/auth/reset/:token    Metodo: GET y POST  (Cambiar contraseña)
 
   Rutas Privadas:
-  - http://localhost:4000/api/event   Metodo: GET && POST (Solo para usuarios registrados) (Obtener los eventos segun el usuario && y crear un nuevo evento)
-  - http://localhost:4000/api/event/:id   Metodo: PUT && DELETE  (Solo para usuarios registrados) (Actualizar un evento && Eliminar un evento)
+  - http://localhost:4000/api/event   Metodo: GET y POST (Solo para usuarios registrados) (Obtener los eventos segun el usuario y y crear un nuevo evento)
+  - http://localhost:4000/api/event/:id   Metodo: PUT y DELETE  (Solo para usuarios registrados) (Actualizar un evento y Eliminar un evento)
