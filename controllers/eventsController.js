@@ -14,7 +14,7 @@ const getEvents = async ( req = request, res = response ) => {
   } catch (error) {
     res.status(500).json({ 
       ok: false, 
-      msg: 'Error del sistema' 
+      msg: 'Error del sistema, comuniquese con el administrador'  
     });
   }
 }
@@ -33,7 +33,7 @@ const createEvent = async ( req = request, res = response ) => {
   } catch (error) {
     res.status(500).json({ 
       ok: false, 
-      msg: 'Error del sistema' 
+      msg: 'Error del sistema, comuniquese con el administrador' 
     });
   }
 }

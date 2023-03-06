@@ -2,7 +2,7 @@
 import express from 'express';
 import { check } from 'express-validator'; 
 
-import { authUser, changePasswordProfile, changeProfile, confirmAccount, confirmToken, createUser, newPassword, profile, resetPassword, revalidateToken } from '../controllers/authController.js';
+import { authUser, changePasswordProfile, changeProfile, confirmAccount, confirmToken, createUser, newPassword, profile, ForgotPassword, revalidateToken } from '../controllers/authController.js';
 import { fieldsValidator } from '../middlewares/fieldsValidator.js';
 import jwtValidator from '../middlewares/jwtValidator.js';
 
@@ -21,7 +21,7 @@ routes.post( '/register', [
 ], createUser ); //pasó
 
 routes.get( '/confirm/:token', confirmAccount ); //pasó
-routes.post( '/reset', [ check('email', 'El email es obligatorio').isEmail(), fieldsValidator ], resetPassword ); //pasó
+routes.post( '/forgot-password', [ check('email', 'El email es obligatorio').isEmail(), fieldsValidator ], ForgotPassword ); //pasó
 routes.route( '/reset/:token' )
   .get( confirmToken )
   .post( [

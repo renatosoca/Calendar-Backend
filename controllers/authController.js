@@ -11,11 +11,10 @@ const authUser = async ( req = request, res = response ) => {
   try {
     const user = await userModel.findOne({ email });
     if ( !user ) return res.status(400).json({ ok: false, msg: 'No existe un usuario con este email' });
-
-    //if ( !user.confirmed ) return res.status(400).json({ ok: false, msg: 'El email no ha sido confirmado' });
+    if ( !user.confirmed ) return res.status(400).json({ ok: false, msg: 'Falta confirmar su correo electronico' });
 
     const validPassword = await user.matchPassword( password );
-    if ( !validPassword ) return res.status(400).json({ ok: false, msg: 'Contraseña incorrecta' });
+    if ( !validPassword ) return res.status(400).json({ ok: false, msg: 'Email o contraseña incorrecto' });
 
     const { _id, name } = user;
 
@@ -28,7 +27,10 @@ const authUser = async ( req = request, res = response ) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ ok: false, msg: 'Error del sistema, comunicate con el administrador' });
+    res.status(500).json({ 
+      ok: false, 
+      msg: 'Error del sistema, comuniquese con el administrador' 
+    });
   }
 }
 
@@ -51,9 +53,7 @@ const createUser = async ( req = request, res = response ) => {
 
     return res.status(201).json({ 
       ok: true,
-      _id,
-      name,
-      //token: generateJWT( _id, name ),
+      msg: 'Hemos enviado las instrucciones a tu correo electrónico'
     });
   } catch (error) {
     console.log(error);
@@ -81,7 +81,7 @@ const confirmAccount = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findOne({ token });
-    if ( !user ) return res.status(404).json({ ok: false, msg: 'Token no válido' });
+    if ( !user ) return res.status(404).json({ ok: false, msg: 'Token no válido o expirado' });
 
     user.confirmed = true;
     user.token = null;
@@ -89,7 +89,7 @@ const confirmAccount = async ( req = request, res = response ) => {
 
     return res.status(201).json({
       ok: true,
-      msg: 'Cuenta Confirmada'
+      msg: 'cuenta confirmada correctamente'
     })
   } catch (error) {
     console.log(error);
@@ -100,14 +100,13 @@ const confirmAccount = async ( req = request, res = response ) => {
   }
 }
 
-const resetPassword = async ( req = request, res = response ) => {
+const ForgotPassword = async ( req = request, res = response ) => {
   const { email } = req.body;
 
   try {
     const user = await userModel.findOne({ email });
-    if ( !user ) return res.status(404).json({ ok: false, msg: 'No existe un usuario con este email' });
-
-    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'El email no ha sido confirmado' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
+    if ( !user ) return res.status(404).json({ ok: false, msg: 'No existe un usuario con ese correo electronico' });
 
     user.token = generateToken();
     const { name, token } = await user.save();
@@ -136,11 +135,12 @@ const confirmToken = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findOne({ token });
-    if ( !user ) return res.status(404).json({ ok: false, msg: 'Token no válido' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
+    if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no registrado' });
 
     return res.status(201).json({
       ok: true,
-      msg: 'Token válido'
+      msg: 'Por favor, ingrese su nueva contraseña'
     })
   } catch (error) {
     return res.status(500).json({
@@ -156,7 +156,8 @@ const newPassword = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findOne({ token });
-    if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no encontrado' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
+    if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no registrado' });
 
     user.token = null;
     user.password = password;
@@ -164,7 +165,7 @@ const newPassword = async ( req = request, res = response ) => {
 
     return res.status(200).json({
       ok: true,
-      msg: 'Contraseña actualizada'
+      msg: 'Contraseña actualizada correctamente'
     })
   } catch (error) {
     return res.status(500).json({
@@ -198,6 +199,7 @@ const changeProfile = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findById( id );
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
     if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no encontrado' });
 
     if ( user.email !== email ) {
@@ -213,6 +215,7 @@ const changeProfile = async ( req = request, res = response ) => {
     return res.status(200).json({
       ok: true,
       user: updateUser,
+      msg: 'Perfil actualizado correctamente'
     })
   } catch (error) {
     return res.status(500).json({
@@ -226,10 +229,10 @@ const changePasswordProfile = async ( req = request, res = response ) => {
   const { _id } = req.user;
   const { oldPassword, newPassword } = req.body;
 
-
   try {
     const user = await userModel.findById( _id );
     if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no encontrado' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
 
     const validPassword = await user.matchPassword( oldPassword );
     if ( !validPassword ) return res.status(404).json({ ok: false, msg: 'La contraseña actual es incorrecta' });
@@ -254,7 +257,7 @@ export {
   createUser,
   revalidateToken,
   confirmAccount,
-  resetPassword,
+  ForgotPassword,
   confirmToken,
   newPassword,
   profile,
