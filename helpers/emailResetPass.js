@@ -48,7 +48,7 @@ const emailResetPass = async ( payload ) => {
                 <p>Hemos recibido su solicitud para reestablecer su contraseña en nuestro sitio web <span style="font-weight: bold; font-size: 1.1rem;">Calendario App</span></p>
                 <p>Para continuar con el proceso de reestablecimiento de contraseña, haga click en el siguiente enlace :</p>
         
-                <a href="${process.env.FRONT_URI}/confirm/${token}" target="_blank" style="padding: 1rem; text-align: center; display: block; color: #f1f1f1; background-color: #9875FB;text-decoration: none; border-radius: 5rem; margin-bottom: 1rem;">Confirmar Cuenta</a>
+                <a href="${process.env.FRONT_URI}/auth/confirm/${token}" target="_blank" style="padding: 1rem; text-align: center; display: block; color: #f1f1f1; background-color: #9875FB;text-decoration: none; border-radius: 5rem; margin-bottom: 1rem;">Confirmar Cuenta</a>
               </div>  <!-- End Body -->
         
               <div style="margin-top: 1.5rem; line-height: 1.8;">

@@ -105,8 +105,8 @@ const ForgotPassword = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findOne({ email });
-    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
     if ( !user ) return res.status(404).json({ ok: false, msg: 'No existe un usuario con ese correo electronico' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
 
     user.token = generateToken();
     const { name, token } = await user.save();
@@ -135,8 +135,8 @@ const confirmToken = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findOne({ token });
-    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
     if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no registrado' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
 
     return res.status(201).json({
       ok: true,
@@ -156,8 +156,8 @@ const newPassword = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findOne({ token });
-    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
     if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no registrado' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
 
     user.token = null;
     user.password = password;
@@ -199,8 +199,8 @@ const changeProfile = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findById( id );
-    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
     if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no encontrado' });
+    if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
 
     if ( user.email !== email ) {
       const emailExist = await userModel.findOne({ email });

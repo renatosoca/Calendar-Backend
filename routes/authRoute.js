@@ -22,9 +22,7 @@ routes.post( '/register', [
 
 routes.get( '/confirm/:token', confirmAccount ); //pasó
 routes.post( '/forgot-password', [ check('email', 'El email es obligatorio').isEmail(), fieldsValidator ], ForgotPassword ); //pasó
-routes.route( '/reset/:token' )
-  .get( confirmToken )
-  .post( [
+routes.post( '/reset/:token', [
     check('password', `La contraseña debe tener mínimo 8 caracteres.Debe contener una letra minúscula.Debe contener una letra mayúscula. Debe contener un carácter especial.Debe contener mínimo un número.` ).isLength({ min: 8 }).matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
     fieldsValidator,
   ], newPassword ); //pasaron
@@ -32,7 +30,7 @@ routes.route( '/reset/:token' )
 routes.use( jwtValidator );
 
 routes.get( '/renew', revalidateToken ); //pasó
-routes.get( '/profile', profile ); //pasó
+//routes.get( '/profile', profile ); //pasó
 routes.put( '/profile/:id', [ check('email', 'El email es obligatorio').isEmail(), fieldsValidator ], changeProfile ); //pasó
 routes.put( '/password-profile', [
   check('oldPassword', 'La contraseña actual es obligatorio').isLength({ min: 1 }),

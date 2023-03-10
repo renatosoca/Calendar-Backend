@@ -27,10 +27,6 @@ const userSchema = new Schema({
   confirmed: {
     type: Boolean,
     default: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
   }
 });
 
