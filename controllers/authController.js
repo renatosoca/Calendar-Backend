@@ -82,6 +82,7 @@ const confirmAccount = async ( req = request, res = response ) => {
   try {
     const user = await userModel.findOne({ token });
     if ( !user ) return res.status(404).json({ ok: false, msg: 'Token no válido o expirado' });
+    if ( user.confirmed ) return res.status(401).json({ ok: false, msg: 'Su cuenta ya ha sido confirmada anteriormente, por lo que no es necesario que intente confirmarla de nuevo. Por favor, utilice la información de inicio de sesión que se le proporcionó anteriormente para acceder a su cuenta.' });
 
     user.confirmed = true;
     user.token = null;
@@ -111,7 +112,6 @@ const ForgotPassword = async ( req = request, res = response ) => {
     user.token = generateToken();
     const { name, token } = await user.save();
 
-    //Enviar Email
     emailResetPass({
       email,
       name,
@@ -156,15 +156,20 @@ const newPassword = async ( req = request, res = response ) => {
 
   try {
     const user = await userModel.findOne({ token });
-    if ( !user ) return res.status(404).json({ ok: false, msg: 'Usuario no registrado' });
+    if ( !user ) return res.status(404).json({ ok: false, msg: 'Token no válido o expirado' });
     if ( !user.confirmed ) return res.status(401).json({ ok: false, msg: 'falta confirmar su correo electronico' });
 
     user.token = null;
     user.password = password;
-    await user.save();
+    const newUser = await user.save();
+    console.log(newUser);
 
+    const { _id, email, name } = newUser;
     return res.status(200).json({
       ok: true,
+      email,
+      name,
+      jwt:  generateJWT( _id, name ),
       msg: 'Contraseña actualizada correctamente'
     })
   } catch (error) {
