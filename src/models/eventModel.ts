@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
+import { Event } from "../interfaces";
 
-const eventSchema = new Schema({
+const eventSchema = new Schema<Event>({
   title: {
     type: String,
     required: true,
@@ -18,11 +19,11 @@ const eventSchema = new Schema({
     type: Date,
     required: true,
   },
-  user: {
+  createdFor: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   }
-});
+}, { timestamps: true, versionKey: false });
 
-export default model("Event", eventSchema);
+export default model<Event>("Event", eventSchema);

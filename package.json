@@ -1,12 +1,11 @@
 {
   "name": "calendar-backend",
   "version": "1.0.0",
-  "description": "Backend del proyecto calendar",
+  "description": "Backend de Calendar",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon src/index.ts",
+    "start": "tsc && node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -14,9 +13,6 @@
   },
   "author": "Renato Soca",
   "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^2.0.20"
-  },
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
@@ -27,5 +23,18 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.0",
     "nodemailer": "^6.9.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/cors": "^2.8.13",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/mongoose": "^5.11.97",
+    "@types/multer": "^1.4.7",
+    "@types/nodemailer": "^6.4.7",
+    "nodemon": "^2.0.21",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
   }
 }
