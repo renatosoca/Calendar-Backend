@@ -1,22 +1,23 @@
 import { Request, Response } from 'express';
 import { userModel } from '../models';
-import { emailUserRegister, emailUserResetPass, generateJWT, generateToken, comparePassword, hashPassword } from '../helpers';
+import {  emailUserResetPass, generateJWT, generateToken, comparePassword, hashPassword, emailUserRegister } from '../helpers';
 import { UserRequest } from '../interfaces';
 
 export const userAuth = async ({ body }: Request, res: Response) => {
   const { email, password } = body;
 
   try {
-    const user = await userModel.findOne({ email }).select('-password -token -confirmed -createdAt -updatedAt');
+    const user = await userModel.findOne({ email }).select(' -createdAt -updatedAt');
     if (!user) return res.status(400).json({ ok: false, msg: 'No existe un usuario con este email' });
-    if (!user.confirmed) return res.status(400).json({ ok: false, msg: 'Falta confirmar su correo electronico' });
+    if (!user.confirmed) return res.status(403).json({ ok: false, msg: 'Falta confirmar su correo electronico' });
 
     const validPassword = comparePassword(password, user.password);
     if (!validPassword) return res.status(400).json({ ok: false, msg: 'Email o contraseña incorrecto' });
 
+    const { _id, name, lastname } = user;
     return res.status(201).json({
       ok: true,
-      user,
+      user: { _id, name, lastname, email },
       jwt: generateJWT(user._id, user.email),
     });
   } catch (error) {
@@ -25,15 +26,16 @@ export const userAuth = async ({ body }: Request, res: Response) => {
 }
 
 export const userRegister = async ({ body }: Request, res: Response) => {
-  const { email, name } = body;
+  const { email, name, password } = body;
 
   try {
     const userExist = await userModel.findOne({ email });
     if (userExist) return res.status(400).json({ ok: false, msg: 'El email ya está en uso' });
 
     const user = new userModel(body);
+    user.password = hashPassword(password);
     const { lastname, token } = await user.save();
-
+    
     await emailUserRegister( email, name, lastname, token );
 
     return res.status(201).json({
@@ -116,11 +118,11 @@ export const resetPassword = async ({ params, body }: Request, res: Response) =>
 
     user.token = '';
     user.password = hashPassword(password);
-    const { _id, email, name } = await user.save();
+    const { _id, email, name, lastname } = await user.save();
 
     return res.status(200).json({
       ok: true,
-      user: { _id, email, name },
+      user: { _id, email, name, lastname },
       jwt: generateJWT(_id, name),
       msg: 'Contraseña actualizada correctamente'
     })

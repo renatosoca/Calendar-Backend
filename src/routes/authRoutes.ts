@@ -44,7 +44,7 @@ routes.put('/user-profile/:id', [
   fieldValidations
 ], updateUserProfile);
 
-routes.put('/password-profile', [
+routes.put('/password-profile/:id', [
   check('oldPassword', 'La contraseña actual debe tener mínimo 8 caracteres.').isLength({ min: 8 }),
   check('newPassword', `La nueva contraseña debe tener mínimo 8 caracteres, una letra minúscula, una letra mayúscula y un carácter especial.`).isLength({ min: 8 }).matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
   fieldValidations,
